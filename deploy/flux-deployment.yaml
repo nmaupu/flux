@@ -49,6 +49,15 @@ spec:
       #   configMap:
       #     name: flux-kubeconfig
 
+      # The following volume is used to import GPG keys (for signing
+      # and verification purposes). You will also need to provide the
+      # secret with the keys, and uncomment the volumeMount and args
+      # below.
+      # - name: gpg-keys
+      #   secret:
+      #     secretName: flux-gpg-keys
+      #     defaultMode: 0400
+
       containers:
       - name: flux
         # There are no ":latest" images for flux. Find the most recent
@@ -87,6 +96,12 @@ spec:
         # - name: KUBECONFIG
         #   value: /etc/fluxd/kube/config
 
+        # Include this and the volume "gpg-keys" abovce, and the
+        # args below.
+        # - name: gpg-keys
+        #   mountPath: /root/gpg-import
+        #   readOnly: true
+
         args:
 
         # if you deployed memcached in a different namespace to flux,
@@ -105,6 +120,13 @@ spec:
         # replace or remove the following URL
         - --git-url=git@github.com:weaveworks/flux-get-started
         - --git-branch=master
+
+        # include these two to enable git commit signing
+        # - --git-gpg-key-import=/root/gpg-import
+        # - --git-signing-key=<key id>
+        
+        # include this to enable git signature verification
+        # - --git-verify-signatures
 
         # include these next two to connect to an "upstream" service
         # (e.g., Weave Cloud). The token is particular to the service.
