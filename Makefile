@@ -1,6 +1,8 @@
 .DEFAULT: all
 .PHONY: all release-bins clean realclean test integration-test check-generated
 
+DOCKER_REGISTRY ?= quay.io/weaveworks
+
 SUDO := $(shell docker info > /dev/null 2> /dev/null || echo "sudo")
 
 TEST_FLAGS?=
@@ -47,7 +49,7 @@ test: test/bin/helm test/bin/kubectl
 build/.%.done: docker/Dockerfile.%
 	mkdir -p ./build/docker/$*
 	cp $^ ./build/docker/$*/
-	$(SUDO) docker build -t quay.io/weaveworks/$* -t quay.io/weaveworks/$*:$(IMAGE_TAG) \
+	$(SUDO) docker build -t $(DOCKER_REGISTRY)/$* -t $(DOCKER_REGISTRY)/$*:$(IMAGE_TAG) \
 		--build-arg VCS_REF="$(VCS_REF)" \
 		--build-arg BUILD_DATE="$(BUILD_DATE)" \
 		-f build/docker/$*/Dockerfile.$* ./build/docker/$*
